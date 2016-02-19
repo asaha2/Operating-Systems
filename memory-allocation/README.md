@@ -1,0 +1,2 @@
+#memory-allocation
+This program implements a memory allocation library that is equivalent to the malloc library provided by Unix-like operating systems. The malloc() function allocates variable sized contiguous memory chunks on the heap, which is the memory segment just after the uninitialized data segment. The current end of the heap is given by the program break. The malloc() and related functions are built on top of brk() and sbrk().
