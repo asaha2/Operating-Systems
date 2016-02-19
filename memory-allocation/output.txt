@@ -1,0 +1,128 @@
+===================DATA INTEGRITY TEST===================
+@test_info: initial shakedown = no initialization/allocations made yet
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 0
+@mem_stat: amount of available free space = 0
+@mem_stat: amount of largest contiguous free space = 0
+@mem_stat: no. of bytes allocated = 0
+
+@test_info: memory initialized and allocation policy set to first fit
+@test_info: : allocate negative memory bytes. . .
+@error_alert: cannot allocate negative memory!
+=========================================================
+@test_case_1: allocation of 2048 bytes. . .
+@test_info: filling allocated blocks with integers. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 2
+@mem_stat: amount of available free space = 14336
+@mem_stat: amount of largest contiguous free space = 14336
+@mem_stat: no. of bytes allocated = 2048
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+
+buffer: 0x1598408
+@test_success: allocated bytes match cumulative requested size!
+@test_success: free space cumulative size matches!
+@test_success: largest contiguous free space matches!
+=========================================================
+@test_case_2: allocation of 4096 bytes. . .
+@test_info: filling allocated blocks with integers. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 3
+@mem_stat: amount of available free space = 10232
+@mem_stat: amount of largest contiguous free space = 10232
+@mem_stat: no. of bytes allocated = 6144
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+
+buffer2: 0x1598c10
+@test_success: allocated bytes match cumulative requested size!
+@test_success: free space cumulative size matches!
+@test_success: largest contiguous free space matches!
+=========================================================
+@test_case_3: deallocating bytes 2048 bytes. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 3
+@mem_stat: amount of available free space = 12288
+@mem_stat: amount of largest contiguous free space = 10232
+@mem_stat: no. of bytes allocated = 4096
+
+@test_success: remaining allocated bytes following deallocation matches as expected!
+@test_success: free space cumulative size following deallocation matches as expected!
+@test_success: largest contiguous free space following deallocation matches as expected!
+=========================================================
+@test_case_4: reallocating 2048 bytes -- test for free space selection
+runtime_info: 0 extra bytes has been padded to the requested malloc()
+@test_info: filling allocated blocks with integers. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 4
+@mem_stat: amount of available free space = 10232
+@mem_stat: amount of largest contiguous free space = 10232
+@mem_stat: no. of bytes allocated = 6144
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+
+buffer3: 0x1598408
+@test_success: total allocated bytes following reallocation matches as expected!
+@test_success: total free space cumulative size following reallocation matches as expected!
+@test_success: largest contiguous free space following reallocation matches as expected!
+=========================================================
+@test_case_5: deallocating bytes 2048 bytes. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 4
+@mem_stat: amount of available free space = 12288
+@mem_stat: amount of largest contiguous free space = 10232
+@mem_stat: no. of bytes allocated = 4096
+
+@test_success: total allocated bytes following 2nd deallocation matches as expected!
+@test_success: total free space cumulative size following 2nd deallocation matches as expected!
+@test_success: largest contiguous free space following deallocation matches as expected!
+=========================================================
+@test_case_6: allocation of 15000 bytes. . .
+@test_info: filling allocated blocks with integers. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 5
+@mem_stat: amount of available free space = 13672
+@mem_stat: amount of largest contiguous free space = 10232
+@mem_stat: no. of bytes allocated = 19096
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+
+buffer4: 0x159c410
+@test_success: allocated bytes match cumulative requested size!
+@test_success: free space cumulative size matches!
+@test_success: largest contiguous free space matches!
+=========================================================
+@test_case_7: deallocating bytes 4096 bytes. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 5
+@mem_stat: amount of available free space = 17776
+@mem_stat: amount of largest contiguous free space = 16392
+@mem_stat: no. of bytes allocated = 15000
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+@test_success: total allocated bytes following deallocation matches!
+@test_success: total free space cumulative size following deallocation matches!
+@test_success: largest contiguous free space following deallocation matches!
+=========================================================
+@test_case_8: deallocating bytes 15000 bytes. . .
+
+MEMORY REPORT:
+@mem_stat: total no. of my_malloc() calls since beginning = 5
+@mem_stat: amount of available free space = 32784
+@mem_stat: amount of largest contiguous free space = 32784
+@mem_stat: no. of bytes allocated = 0
+
+@test_info: printing current buffer statistics and doing healthcheck. . .
+@test_success: total allocated bytes following deallocation matches!
+@test_success: total free space cumulative size following deallocation matches!
+@test_success: largest contiguous free space following deallocation matches!
+=========================================================
