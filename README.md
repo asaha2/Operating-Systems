@@ -1,3 +1,2 @@
 # operating-systems
-
-Homework assignments from the Operating Systems course.
+Novel operating system components mimicking Unix-based implementation
