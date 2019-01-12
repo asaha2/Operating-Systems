@@ -1,9 +1,9 @@
 #include "disk_emu.h"
 
 /*
-NAME- ADITYA SAHA
-ID- 260453165
-*/
+ NAME- ADITYA SAHA
+ ID- 260453165
+ */
 
 #define DISK_FILE "adi_sfs_disk.disk"
 #define MAX_FNAME_LENGTH 20
@@ -29,12 +29,14 @@ ID- 260453165
 #define FILENAME "aditya.sfs"
 #define ALIGN(x)((x/BLOCKSIZE + 1) * BLOCKSIZE)
 
-typedef struct directoryEntry{
+typedef struct directoryEntry
+{
     char filename[MAXFILENAME + 1];
     unsigned int inode;
 } directoryEntry;
 
-typedef struct inodeEntry{
+typedef struct inodeEntry
+{
     unsigned int mode;
     unsigned int linkCount;
     unsigned int size;
@@ -42,7 +44,8 @@ typedef struct inodeEntry{
     unsigned int singleIndirectPtr;
 } inodeEntry;
 
-typedef struct fileDescriptorEntry{
+typedef struct fileDescriptorEntry
+{
     unsigned int inode;
     unsigned int rwPointer;
 } fileDescriptorEntry;
@@ -57,12 +60,11 @@ int sfs_fwrite(int fileID, const char *buf, int length);
 int sfs_fseek(int fileID, int loc);
 int sfs_remove(char *file);
 
-void init_root();               
-void init_itable();            
+void init_root();
+void init_itable();
 void do_free(unsigned int index);
 int find_available();
-void init_free();                     
-void do_alloc(unsigned int index);     
-void init_superblock();   
-
+void init_free();
+void do_alloc(unsigned int index);
+void init_superblock();
 

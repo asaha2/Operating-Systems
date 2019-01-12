@@ -18,8 +18,8 @@
 
 typedef struct MapFreeStruct
 {
-	struct MapFreeStruct *next;
-	struct MapFreeStruct *prev;
+    struct MapFreeStruct *next;
+    struct MapFreeStruct *prev;
 } MapFreeStruct;
 
 MapFreeStruct *head;
@@ -29,7 +29,7 @@ char *my_malloc_error;
 int* top_block;
 
 /*=========================
-	main required APIs 
+ main required APIs
  =========================*/
 extern char *my_malloc_error;
 void *my_malloc(int len);
@@ -38,17 +38,17 @@ void my_mallopt(int policy);
 void my_mallinfo();
 
 /*================================================
-	helper functions for node creation/deletion
+ helper functions for node creation/deletion
  =================================================*/
 void* nodeCreator(int len, int best_fit);
-void removeNode(MapFreeStruct *iter);      
-void nodeAdder(MapFreeStruct *new); 
+void removeNode(MapFreeStruct *iter);
+void nodeAdder(MapFreeStruct *new);
 
 /*======================================
-	helper functions for bookkeeping
+ helper functions for bookkeeping
  =======================================*/
 int freeSpaceTracker();
 int byteAllocTracker();
 int largeSpaceTracker();
-void contBlockTracker();                    
-void topBlockTracker();        
+void contBlockTracker();
+void topBlockTracker();
