@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #define CHECK_NULL(val)     if(val == NULL) return -1;
 #define MAX_CMD_CHAR        10
@@ -13,22 +14,22 @@
 #define DELIMETER_CHARS     " \t\n"
 #define COMMAND_PROMPT      "simple-shell"
 
-typedef void (*genericFuncPtr)(void);
-typedef void (*variadicFuncPtr)(void);
+typedef void (*genericFuncPtr)(int cmdIdx, char **args, int argsLen);
+void execBuiltInFnc(int cmdIdx, char **args, int argsLen);
 
 typedef struct
 {
     char *cmd;
     genericFuncPtr genericFunc;
-    variadicFuncPtr variadicFunc;
+    /* TODO: Need to expand for custom function execution */
 } CommandTable_t;
 
 CommandTable_t commandTable[] =
 {
-    {"history", NULL,   NULL},
-    {"cd",      NULL,   NULL},
-    {"pwd",     NULL,   NULL},
-    {"exit",    NULL,   NULL},
+    {"history", NULL},
+    {"cd",      execBuiltInFnc},
+    {"pwd",     execBuiltInFnc},
+    {"exit",    execBuiltInFnc},
 };
 
 int parseLine(char *prompt, char *args[], int argsLen, bool *isBackground)
@@ -43,6 +44,13 @@ int parseLine(char *prompt, char *args[], int argsLen, bool *isBackground)
 
     printf("%s: ", prompt);
     length = getline(&line, &lineCap, stdin);
+
+    /* Handle Ctrl-D keystroke */
+    if(feof(stdin))
+    {
+        args[argIdx++] = "exit";
+        return argIdx;
+    }
 
     if(length <= 0)
         return -1;
@@ -62,6 +70,7 @@ int parseLine(char *prompt, char *args[], int argsLen, bool *isBackground)
     {
         for(int idx = 0; idx < strlen(token); idx++)
         {
+            /* Null terminate tokens */
             if(token[idx] <= ' ')
                 token[idx] = '\0';
         }
@@ -90,9 +99,99 @@ int scanTable(char *arg)
     return -1;
 }
 
-void execBuiltInFnc(void)
+void execBuiltInFnc(int cmdIdx, char **args, int argsLen)
 {
-    /* TODO: will implement later */
+    /* TODO: need to check for NULL */
+
+    switch(cmdIdx)
+    {
+        char *currentDir;
+
+        case 0: /* history */
+            break;
+
+        case 1: /* cd */
+            if(chdir(args[1]) != 0)
+                printf("Failed to change directory.\n");
+            break;
+
+        case 2: /* pwd */
+            if((currentDir = getcwd(NULL, 0)) != NULL)
+            {
+                printf("%s\n", currentDir);
+            } else
+            {
+                printf("Failed to retrieve current working directory.\n");
+            }
+            break;
+
+        case 3: /* exit */
+            exit(EXIT_SUCCESS);
+            break;
+    }
+
+#if 0
+
+    //if "cd" is typed
+    else if(strcmp(args[0], bi_2) == 0)
+    {
+        int chk;
+        chk = chdir(args[1]);
+        if(chk != 0)
+        {
+            printf("Failed to execute chdir!\n");
+        }
+    }
+
+    //if "pwd" is typed
+    else if(strcmp(args[0], bi_3) == 0)
+    {
+        char cwd[1024], *chk;
+        chk = getcwd(cwd, sizeof(cwd));
+        if(chk == NULL)
+        {
+            printf("Failed to execute getcwd!\n");
+        } else
+        {
+            printf("Current working dir: %s\n", cwd);
+        }
+    }
+
+    //if "exit" is typed
+    else
+    {
+        printf("Shell is exiting...\n");
+
+        //de-allocate history story
+        current = head;
+        while(current != NULL)
+        {
+            int i;
+            for(i = 0; !(current->values[i]); i++)
+            {
+                free(current->values[i]);
+            }
+            current = current->next;
+        }
+        free(current);
+        free(head);
+
+        //de-allocate job struct
+        crnt = hd;
+        while(crnt != NULL)
+        {
+            int j;
+            for(j = 0; !(crnt->comm[j]); j++)
+            {
+                free(crnt->comm[j]);
+            }
+        }
+        free(crnt);
+        free(hd);
+
+        exit(EXIT_SUCCESS);
+    }
+#endif
 }
 
 int main(void)
@@ -117,10 +216,7 @@ int main(void)
             {
                 if(commandTable[cmdIdx].genericFunc)
                 {
-                    /* TODO: will implement later */
-                } else if(commandTable[cmdIdx].variadicFunc)
-                {
-                    /* TODO: will implement later */
+                    commandTable[cmdIdx].genericFunc(cmdIdx, args, tokenCnt - 1);
                 } else
                 {
                     printf("Command not supported.\n");
