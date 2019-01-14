@@ -5,56 +5,132 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdbool.h>
 
-/*
- NAME- ADITYA SAHA
- ID- 260453165
- */
+#define CHECK_NULL(val)     if(val == NULL) return -1;
+#define MAX_CMD_CHAR        10
+#define MAX_CMD_ARGS        50
+#define DELIMETER_CHARS     " \t\n"
+#define COMMAND_PROMPT      "simple-shell"
 
-int getcmd(char *prompt, char *args[], int *background)
+typedef void (*genericFuncPtr)(void);
+typedef void (*variadicFuncPtr)(void);
+
+typedef struct
 {
-    int length, i = 0;
-    char *token, *loc;
-    char *line;
-    size_t linecap = 0;
+    char *cmd;
+    genericFuncPtr genericFunc;
+    variadicFuncPtr variadicFunc;
+} CommandTable_t;
 
-    printf("%s", prompt);
-    length = getline(&line, &linecap, stdin);
+CommandTable_t commandTable[] =
+{
+    {"history", NULL,   NULL},
+    {"cd",      NULL,   NULL},
+    {"pwd",     NULL,   NULL},
+    {"exit",    NULL,   NULL},
+};
+
+int parseLine(char *prompt, char *args[], int argsLen, bool *isBackground)
+{
+    int length, argIdx = 0;
+    char *token, *loc, *line;
+    size_t lineCap = 0;
+
+    /* Check for NULL pointer in passed arguments */
+    CHECK_NULL(prompt)
+    CHECK_NULL(isBackground)
+
+    printf("%s: ", prompt);
+    length = getline(&line, &lineCap, stdin);
 
     if(length <= 0)
-    {
-        exit(-1);
-    }
+        return -1;
 
-    // Check if background is specified..
-    if((loc = index(line, '&')) != NULL)
+    /* Check if background flag is specified */
+    if((loc = strchr(line, '&')) != NULL)
     {
-        *background = 1;
+        *isBackground = true;
         *loc = ' ';
-    }
-    else
+    } else
     {
-        *background = 0;
+        *isBackground = false;
     }
 
-    while((token = strsep(&line, " \t\n")) != NULL)
+    /* Tokenize line arguments */
+    while((token = strsep(&line, DELIMETER_CHARS)) != NULL)
     {
-        int j;
-        for(j = 0; j < strlen(token); j++)
+        for(int idx = 0; idx < strlen(token); idx++)
         {
-            if(token[j] <= 32)
-                token[j] = '\0';
+            if(token[idx] <= ' ')
+                token[idx] = '\0';
         }
-        if(strlen(token) > 0)
-            args[i++] = token;
-    }
-    args[i] = NULL;
 
-    return i;
+        /* Need to ensure argument buffer isn't overflowed */
+        if((strlen(token) > 0) && (argIdx < argsLen - 1))
+            args[argIdx++] = token;
+    }
+
+    /* Return number of tokens parsed */
+    return argIdx;
+}
+
+int scanTable(char *arg)
+{
+    CHECK_NULL(arg);
+
+    /* Scan through command table and return match index */
+    for(int idx = 0; idx < sizeof(commandTable) / sizeof(CommandTable_t); idx++)
+    {
+        if(strcmp(arg, commandTable[idx].cmd) == 0)
+            return idx;
+    }
+
+    /* Default return invalid index */
+    return -1;
+}
+
+void execBuiltInFnc(void)
+{
+    /* TODO: will implement later */
 }
 
 int main(void)
 {
+    char *args[MAX_CMD_ARGS];
+    bool isBackground;
+    int tokenCnt, cmdIdx;
+
+    while(1)
+    {
+        isBackground = false;
+        tokenCnt = parseLine(COMMAND_PROMPT, args, MAX_CMD_ARGS, &isBackground);
+
+        if(tokenCnt > 0)
+        {
+            cmdIdx = scanTable(args[0]);
+
+            if(cmdIdx < 0)
+            {
+                printf("Command not supported.\n");
+            } else
+            {
+                if(commandTable[cmdIdx].genericFunc)
+                {
+                    /* TODO: will implement later */
+                } else if(commandTable[cmdIdx].variadicFunc)
+                {
+                    /* TODO: will implement later */
+                } else
+                {
+                    printf("Command not supported.\n");
+                }
+            }
+        }
+    }
+
+#if 0
+
     char *args[20];
     int bg;
 
@@ -157,8 +233,7 @@ int main(void)
                         if(chk == NULL)
                         {
                             printf("Failed to execute getcwd!\n");
-                        }
-                        else
+                        } else
                         {
                             printf("Current working dir: %s\n", cwd);
                         }
@@ -192,8 +267,7 @@ int main(void)
                         {
                             printf("@usage: fg <job_id>\n");
                             printf("type jobs to get the job ID\n");
-                        }
-                        else
+                        } else
                         {
                             crnt = hd;
                             while(crnt != NULL)
@@ -358,12 +432,12 @@ int main(void)
                             //<--debugger code-->
                             // current = head;
                             // while(current != NULL){
-                            // 	int i;
-                            // 	for(i = 0; i < count; i++){
-                            // 		printf("iterator %d: %s\n", i, current->values[i]);
-                            // 	}
-                            // 	printf("\n");
-                            // 	current = current->next;
+                            //  int i;
+                            //  for(i = 0; i < count; i++){
+                            //      printf("iterator %d: %s\n", i, current->values[i]);
+                            //  }
+                            //  printf("\n");
+                            //  current = current->next;
                             // }
 
                         }
@@ -391,12 +465,12 @@ int main(void)
                                 // printf("Here goes:\n");
                                 // current = head;
                                 // while(current != NULL){
-                                // 	int i;
-                                // 	for(i = 0; i < count; i++){
-                                // 		printf("iterator %d: %s\n", i, current->values[i]);
-                                // 	}
-                                // 	printf("\n");
-                                // 	current = current->next;
+                                //  int i;
+                                //  for(i = 0; i < count; i++){
+                                //      printf("iterator %d: %s\n", i, current->values[i]);
+                                //  }
+                                //  printf("\n");
+                                //  current = current->next;
                                 // }
 
                             }
@@ -427,12 +501,12 @@ int main(void)
                                 // printf("Here goes:\n");
                                 // current = head;
                                 // while(current != NULL){
-                                // 	int i;
-                                // 	for(i = 0; i < count; i++){
-                                // 		printf("iterator %d: %s\n", i, current->values[i]);
-                                // 	}
-                                // 	printf("\n");
-                                // 	current = current->next;
+                                //  int i;
+                                //  for(i = 0; i < count; i++){
+                                //      printf("iterator %d: %s\n", i, current->values[i]);
+                                //  }
+                                //  printf("\n");
+                                //  current = current->next;
                                 // }
 
                             }
@@ -487,20 +561,22 @@ int main(void)
                 // printf("Here goes:\n");
                 // crnt = hd;
                 // while(crnt != NULL){
-                // 	int i;
-                // 	for(i = 0; (crnt->comm[i] != NULL); i++){
-                // 		printf("%s ", crnt->comm[i]);
-                // 	}
-                // 	printf("\n");
-                // 	printf("Process id: %d\n", crnt->proc_id);
-                // 	printf("Job id: %d\n", crnt->job_id);
-                // 	crnt = crnt->nxt;
-                // 	printf("\n");
+                //  int i;
+                //  for(i = 0; (crnt->comm[i] != NULL); i++){
+                //      printf("%s ", crnt->comm[i]);
+                //  }
+                //  printf("\n");
+                //  printf("Process id: %d\n", crnt->proc_id);
+                //  printf("Job id: %d\n", crnt->job_id);
+                //  crnt = crnt->nxt;
+                //  printf("\n");
                 // }
             }
         }
 
     }
 
-    return 1;
+#endif
+
+    return 0;
 }
